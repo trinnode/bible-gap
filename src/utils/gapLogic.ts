@@ -27,10 +27,20 @@ export const generateGaps = (
 
   words.forEach((word, i) => {
     if (gapIndices.has(i)) {
-      const nonGapWords = words.filter((_, idx) => !gapIndices.has(idx));
-      const distractors = nonGapWords.sort(() => Math.random() - 0.5).slice(0, 3);
-      const opts = [word, ...distractors];
-      options.push(opts);
+      const seen = new Set<string>([word]);
+      const pool = words.filter((_, idx) => !gapIndices.has(idx));
+      const distractors: string[] = [];
+      for (let start = 0; start < pool.length && distractors.length < 3; start++) {
+        const j = start + Math.floor(Math.random() * (pool.length - start));
+        const candidate = pool[j];
+        if (!seen.has(candidate)) {
+          seen.add(candidate);
+          distractors.push(candidate);
+        }
+        pool[j] = pool[start];
+        pool[start] = candidate;
+      }
+      options.push([word, ...distractors]);
       answers.push(word);
     } else {
       options.push([]);

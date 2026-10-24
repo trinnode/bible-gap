@@ -5,9 +5,8 @@ import GameScreen from '../../src/screens/GameScreen';
 const mockGoBack = jest.fn();
 const mockNavigation = { goBack: mockGoBack };
 
-jest.mock('@expo-google-fonts/inter', () => ({
-  useFonts: jest.fn(() => [true]),
-  Inter_400Regular: 'Inter_400Regular',
+jest.mock('../../src/hooks/useAppFonts', () => ({
+  useAppFonts: jest.fn(() => [true, null]),
 }));
 
 jest.mock('../../src/services/db', () => ({
@@ -19,6 +18,7 @@ jest.mock('../../src/services/db', () => ({
       version: 'KJV',
     },
   ]),
+  warmUpVerses: jest.fn(async () => {}),
 }));
 
 describe('GameScreen', () => {

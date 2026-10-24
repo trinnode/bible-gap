@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import { useFonts, Inter_400Regular } from '@expo-google-fonts/inter';
 import { useState, useEffect } from 'react';
-import { getRandomVerses, initDB } from '../services/db';
+import { getRandomVerses, initDB, warmUpVerses } from '../services/db';
 import { generateGaps, scoreAnswers } from '../utils/gapLogic';
+import { useAppFonts } from '../hooks/useAppFonts';
 
 interface VerseItem {
   reference: string;
@@ -19,25 +19,40 @@ interface VerseItem {
 }
 
 export default function GameScreen({ navigation }: any) {
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-  });
+  const [fontsLoaded] = useAppFonts();
   const [verse, setVerse] = useState<VerseItem | null>(null);
   const [gapOptions, setGapOptions] = useState<string[][]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [isChecking, setIsChecking] = useState(false);
   const [showResult, setShowResult] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
-    initDB().then(() => getRandomVerses(1).then(verses => {
-      if (verses.length) {
+    const watchdog = setTimeout(() => setLoadFailed(true), 6000);
+    return () => clearTimeout(watchdog);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    initDB()
+      .then(() => getRandomVerses(1))
+      .then(verses => {
+        if (cancelled || !verses.length) return;
         const v = verses[0];
         setVerse(v);
         const { options, answers: ans } = generateGaps(v.text);
         setGapOptions(options);
         setAnswers(ans);
-      }
-    }));
+      })
+      .catch(() => {
+        // DB failed — nothing we can do; loading state persists with error text.
+        if (!cancelled) setVerse(null);
+      });
+    // Network enrichment runs in the background; never blocks gameplay.
+    warmUpVerses();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleSelect = (gapIndex: number, chosen: string) => {
@@ -60,7 +75,9 @@ export default function GameScreen({ navigation }: any) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={styles.loadingText}>
+          {loadFailed ? 'Could not load a verse. Please restart the app.' : 'Loading...'}
+        </Text>
       </View>
     );
   }

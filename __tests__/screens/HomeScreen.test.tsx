@@ -5,9 +5,8 @@ import HomeScreen from '../../src/screens/HomeScreen';
 const mockNavigate = jest.fn();
 const mockNavigation = { navigate: mockNavigate };
 
-jest.mock('@expo-google-fonts/inter', () => ({
-  useFonts: jest.fn(() => [true]),
-  Inter_400Regular: 'Inter_400Regular',
+jest.mock('../../src/hooks/useAppFonts', () => ({
+  useAppFonts: jest.fn(() => [true, null]),
 }));
 
 jest.mock('../../src/services/update', () => ({
@@ -17,6 +16,7 @@ jest.mock('../../src/services/update', () => ({
 jest.mock('../../src/services/db', () => ({
   initDB: jest.fn(async () => {}),
   getRandomVerses: jest.fn(async () => []),
+  warmUpVerses: jest.fn(async () => {}),
 }));
 
 describe('HomeScreen', () => {
@@ -63,8 +63,8 @@ describe('HomeScreen', () => {
   });
 
   it('renders loading state when fonts are not loaded', async () => {
-    const { useFonts } = require('@expo-google-fonts/inter');
-    useFonts.mockReturnValueOnce([false]);
+    const { useAppFonts } = require('../../src/hooks/useAppFonts');
+    useAppFonts.mockReturnValueOnce([false, null]);
     const { getByText } = await render(<HomeScreen navigation={mockNavigation} />);
     expect(getByText('Loading Bible Gap...')).toBeTruthy();
   });

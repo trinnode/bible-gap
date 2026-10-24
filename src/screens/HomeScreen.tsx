@@ -1,23 +1,20 @@
 import * as React from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
-import { useFonts, Inter_400Regular } from '@expo-google-fonts/inter';
 import { checkForUpdate } from '../services/update';
-import { initDB, getRandomVerses } from '../services/db';
+import { initDB, warmUpVerses } from '../services/db';
+import { useAppFonts } from '../hooks/useAppFonts';
 
 export default function HomeScreen({ navigation }: any) {
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-  });
+  const [fontsLoaded] = useAppFonts();
 
   React.useEffect(() => {
-    // Initialize DB and load verses once
-    initDB().then(() => getRandomVerses(5));
-    // Check for update (runs once)
+    // Seed the DB (instant, offline) then enrich from network in background.
+    initDB().then(() => warmUpVerses());
     checkForUpdate().then(v => {
       if (v) {
         console.log('Update available:', v);
       }
-    });
+    }).catch(() => {});
   }, []);
 
   if (!fontsLoaded) {

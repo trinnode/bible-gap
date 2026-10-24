@@ -2,9 +2,8 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import App from '../App';
 
-jest.mock('@expo-google-fonts/inter', () => ({
-  useFonts: jest.fn(() => [true]),
-  Inter_400Regular: 'Inter_400Regular',
+jest.mock('../src/hooks/useAppFonts', () => ({
+  useAppFonts: jest.fn(() => [true, null]),
 }));
 
 jest.mock('../src/services/update', () => ({
@@ -14,6 +13,7 @@ jest.mock('../src/services/update', () => ({
 jest.mock('../src/services/db', () => ({
   initDB: jest.fn(async () => {}),
   getRandomVerses: jest.fn(async () => []),
+  warmUpVerses: jest.fn(async () => {}),
 }));
 
 jest.mock('../src/services/notifications', () => ({
