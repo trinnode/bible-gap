@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 
-export const useNotificationPermissions = async () => {
+export const requestNotificationPermissions = async (): Promise<string> => {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let status = existingStatus;
   if (status !== 'granted') {
@@ -14,6 +14,7 @@ export const useNotificationPermissions = async () => {
         body: 'Tap to play a new gap-fill verse!',
       },
       trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
         hour: 9,
         minute: 0,
         repeats: true,

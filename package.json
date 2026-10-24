@@ -1,31 +1,20 @@
 {
   "name": "bible-gap",
   "version": "1.0.0",
-  "main": "expo-router/entry",
+  "main": "node_modules/expo/AppEntry.js",
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo-google-fonts/playfair-display": "^0.4.2",
-    "@expo/ui": "~58.0.21",
-    "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/native": "^7.5.1",
     "@react-navigation/native-stack": "^7.21.0",
     "expo": "~58.0.16",
     "expo-av": "^16.0.8",
-    "expo-constants": "~58.0.12",
-    "expo-device": "~58.0.5",
     "expo-font": "~58.0.9",
-    "expo-glass-effect": "~58.0.4",
-    "expo-image": "~58.0.16",
-    "expo-linking": "~58.0.13",
     "expo-notifications": "^58.1.6",
-    "expo-router": "~58.0.24",
     "expo-splash-screen": "~58.0.10",
     "expo-sqlite": "^58.0.13",
     "expo-status-bar": "~58.0.3",
-    "expo-symbols": "~58.0.4",
-    "expo-system-ui": "~58.0.6",
     "expo-updates": "^58.0.18",
-    "expo-web-browser": "~58.0.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-native": "0.88.0",
@@ -33,22 +22,37 @@
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.10.1",
     "react-native-screens": "~4.30.0",
-    "react-native-web": "~0.21.4",
-    "react-native-worklets": "0.13.0"
+    "react-native-web": "~0.21.4"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^14.1.0",
+    "@types/jest": "30.0.0",
     "@types/react": "~19.3.0",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~58.0.4",
+    "jest": "~30.5.2",
+    "jest-expo": "~58.0.12",
     "typescript": "~6.0.3"
   },
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|react-native-svg|@testing-library/react-native)"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "private": true
 }

@@ -1,26 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { StyleSheet, View } from 'react-native';
 import RootNavigator from './src/navigation/RootNavigator';
-import { useNotificationPermissions } from './src/services/notifications';
+import { requestNotificationPermissions } from './src/services/notifications';
 
 export default function App() {
   useEffect(() => {
-    useNotificationPermissions();
+    requestNotificationPermissions();
   }, []);
 
   return (
     <View style={styles.mainContainer}>
-      <StatusBar barStyle="light" />
-      <NavigationContainer>
-        <RootNavigator />
-      </NavigationContainer>
+      <StatusBar style="light" />
+      <RootNavigator />
     </View>
   );
 }

@@ -10,6 +10,7 @@ import {
 import { useFonts, Inter_400Regular } from '@expo-google-fonts/inter';
 import { useState, useEffect } from 'react';
 import { getRandomVerses, initDB } from '../services/db';
+import { generateGaps, scoreAnswers } from '../utils/gapLogic';
 
 interface VerseItem {
   reference: string;
@@ -32,28 +33,9 @@ export default function GameScreen({ navigation }: any) {
       if (verses.length) {
         const v = verses[0];
         setVerse(v);
-        // generate gaps once verse is loaded
-        const words = v.text.split(/\s+/);
-        const gapCount = Math.max(4, Math.floor(words.length * 0.2));
-        const gapIndices = new Set<number>();
-        while (gapIndices.size < gapCount) {
-          gapIndices.add(Math.floor(Math.random() * words.length));
-        }
-        const optsList: string[][] = [];
-        const ansList: string[] = [];
-        words.forEach((w, i) => {
-          if (gapIndices.has(i)) {
-            const distractors = words.filter((_ , idx) => !gapIndices.has(idx));
-            const opts = [w, ...distractors.sort(() => Math.random() - 0.5).slice(0, 3)];
-            optsList.push(opts);
-            ansList.push(w);
-          } else {
-            optsList.push([]);
-            ansList.push('');
-          }
-        });
-        setGapOptions(optsList);
-        setAnswers(ansList);
+        const { options, answers: ans } = generateGaps(v.text);
+        setGapOptions(options);
+        setAnswers(ans);
       }
     }));
   }, []);
@@ -66,13 +48,10 @@ export default function GameScreen({ navigation }: any) {
 
   const checkAnswers = () => {
     setIsChecking(true);
-    let correct = 0;
-    answers.forEach((ans, i) => {
-      const original = verse?.text.split(/\s+/)[i];
-      if (ans === original) correct++;
-    });
-    const total = gapOptions.length;
-    const percentage = total ? Math.round((correct / total) * 100) : 0;
+    const { correct, total, percentage } = scoreAnswers(
+      answers,
+      verse?.text ?? ''
+    );
     setShowResult(`You got ${correct} of ${total} right (${percentage}%)`);
     setIsChecking(false);
   };
@@ -118,7 +97,7 @@ export default function GameScreen({ navigation }: any) {
 
       <View style={styles.checkButtonContainer}>
         <TouchableOpacity style={styles.checkButton} onPress={checkAnswers} disabled={isChecking}>
-          {isChecking ? 'Checking…' : 'Check!'}
+          <Text style={styles.checkButtonText}>{isChecking ? 'Checking…' : 'Check!'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -152,7 +131,6 @@ const styles = StyleSheet.create({
   },
   verseTextContainer: {
     padding: 16,
-    background: '#fff',
     borderRadius: 8,
     margin: 12,
     shadowColor: '#000',
@@ -187,6 +165,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#2c3e50',
   },
+  checkButtonContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 12,
+  },
   checkButton: {
     backgroundColor: '#27ae60',
     paddingVertical: 12,
@@ -195,9 +177,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 12,
   },
+  checkButtonText: {
+    color: '#fff',
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   resultBox: {
     padding: 16,
-    background: '#ecf0f1',
     margin: 12,
     borderRadius: 8,
   },

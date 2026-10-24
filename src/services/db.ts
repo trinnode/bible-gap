@@ -1,6 +1,6 @@
-import Database from 'expo-sqlite';
+import { openDatabaseSync } from 'expo-sqlite';
 
-const db = Database.openDatabase('bible_gap.db');
+const db = openDatabaseSync('bible_gap.db');
 
 export const initDB = async () => {
   await db.withTransactionAsync(async () => {
@@ -22,16 +22,14 @@ export const initDB = async () => {
 };
 
 export const insertVerse = async (reference: string, text: string, version: string) => {
-  const stmt = await db.prepareAsync(
-    'INSERT INTO verses (reference, text, version) VALUES (?, ?, ?)'
+  await db.runAsync(
+    'INSERT INTO verses (reference, text, version) VALUES (?, ?, ?)',
+    [reference, text, version]
   );
-  await stmt.runAsync([reference, text, version]);
-  await stmt.finalizeAsync();
 };
 
 export const getRandomVerses = async (count: number) => {
-  // We'll just return a fixed list; in a real app you'd randomize from DB.
-  const verses = [
+  const verseRefs = [
     'john-3-16',
     'psalm-23-1',
     'proverbs-3-5',
@@ -43,8 +41,8 @@ export const getRandomVerses = async (count: number) => {
     'jeremiah-29-11',
     '1-corinthians-13-4',
   ];
-  // Fetch each verse from the public API and store it.
-  for (const ref of verses) {
+
+  for (const ref of verseRefs) {
     try {
       const res = await fetch(`https://bible-api.com/${ref}`);
       if (!res.ok) throw new Error('Network error');
@@ -54,9 +52,10 @@ export const getRandomVerses = async (count: number) => {
       console.warn(`Failed to fetch ${ref}`, e);
     }
   }
-  // After inserting, return a random subset.
-  const all = await db.getAllAsync('SELECT reference, text, version FROM verses');
-  // Shuffle simple approach
+
+  const all = await db.getAllAsync<{ reference: string; text: string; version: string }>(
+    'SELECT reference, text, version FROM verses'
+  );
   const shuffled = all.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 };

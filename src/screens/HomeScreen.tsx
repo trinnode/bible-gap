@@ -34,7 +34,6 @@ export default function HomeScreen({ navigation }: any) {
       <Text style={styles.title}>Bible Gap</Text>
       <Text style={styles.subtitle}>Fill in the gaps to complete the verse</Text>
       <Button title="Play" onPress={() => navigation.navigate('Game')} />
-      <Button title="Leaderboard" onPress={() => navigation.navigate('Leaderboard')} />
     </View>
   );
 }
