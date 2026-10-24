@@ -7,12 +7,11 @@
     "@expo-google-fonts/playfair-display": "^0.4.2",
     "@react-navigation/native": "^7.5.1",
     "@react-navigation/native-stack": "^7.21.0",
-    "expo": "~58.0.16",
-    "expo-av": "^16.0.8",
+    "expo": "~58.0.19",
     "expo-font": "~58.0.9",
     "expo-notifications": "^58.1.6",
     "expo-splash-screen": "~58.0.10",
-    "expo-sqlite": "^58.0.13",
+    "expo-sqlite": "~58.0.14",
     "expo-status-bar": "~58.0.3",
     "expo-updates": "^58.0.18",
     "react": "19.3.0",
@@ -22,7 +21,8 @@
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.10.1",
     "react-native-screens": "~4.30.0",
-    "react-native-web": "~0.21.4"
+    "react-native-web": "~0.21.4",
+    "react-native-worklets": "0.13.0"
   },
   "devDependencies": {
     "@testing-library/react-native": "^14.1.0",
@@ -46,7 +46,9 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|react-native-svg|@testing-library/react-native)"
     ],
